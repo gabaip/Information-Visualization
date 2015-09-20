@@ -1,0 +1,91 @@
+# Information-Visualization
+The project of Pini and Ilana
+
+##### Read Bilu intersection data from text file #####
+Bilu <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Bilu.txt")
+names(Bilu) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+##### Convert data #####
+Bilu$Date <- as.Date(Bilu$Date, '%d/%m/%Y')
+Bilu$Time <- as.matrix(Bilu$Time)
+
+##### Display the day of the week in English #####
+Sys.setlocale(category = "LC_ALL", locale = "English_United States.1252")
+
+##### Add column of the day of the week to Bilu intersection data #####
+Day <- data.frame(matrix(weekdays(Bilu$Date), nrow = nrow(Bilu), ncol = 1))
+Bilu <- cbind(Bilu, Day)
+names(Bilu)[6] <- "Day"
+
+##### Add column of the hour of the day to Bilu intersection data #####
+Hour <- data.frame(matrix(substring(Bilu$Time, 1, 2), nrow = nrow(Bilu), ncol = 1))
+Bilu <- cbind(Bilu, Hour)
+names(Bilu)[7] <- "Hour"
+
+library(plyr)
+
+##### Create a frequency table for quantity of the entrances to Bilu intersection by hour and day #####
+Freq_Hour_Day <- count(Bilu, c('Hour','Day'))
+names(Freq_Hour_Day)[3] <- "Frequency"
+
+##### Create a frequency table for quantity of the different entrance dates to Bilu intersection data by day #####
+Freq_Day <- count(subset(count(Bilu, c('Date','Day')), select=-freq), c('Day'))
+names(Freq_Day)[2] <- "Frequency"
+
+##### Sort Freq_Day table by the day of the week #####
+Freq_Day$Day <- factor(Freq_Day$Day, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+Freq_Day <- Freq_Day[order(Freq_Day$Day),]
+
+##### Add column to Freq_Hour_Day table with quantity of the different entrance dates by day #####
+Sunday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Sunday'))
+Sunday_Quantity = as.data.frame(rep(Freq_Day[1,2], nrow(Sunday)))
+Sunday <- cbind(Sunday, Sunday_Quantity)
+names(Sunday)[4] <- "Quantity"
+
+Monday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Monday'))
+Monday_Quantity = as.data.frame(rep(Freq_Day[2,2], nrow(Monday)))
+Monday <- cbind(Monday, Monday_Quantity)
+names(Monday)[4] <- "Quantity"
+
+Tuesday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Tuesday'))
+Tuesday_Quantity = as.data.frame(rep(Freq_Day[3,2], nrow(Tuesday)))
+Tuesday <- cbind(Tuesday, Tuesday_Quantity)
+names(Tuesday)[4] <- "Quantity"
+
+Wednesday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Wednesday'))
+Wednesday_Quantity = as.data.frame(rep(Freq_Day[4,2], nrow(Wednesday)))
+Wednesday <- cbind(Wednesday, Wednesday_Quantity)
+names(Wednesday)[4] <- "Quantity"
+
+Thursday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Thursday'))
+Thursday_Quantity = as.data.frame(rep(Freq_Day[5,2], nrow(Thursday)))
+Thursday <- cbind(Thursday, Thursday_Quantity)
+names(Thursday)[4] <- "Quantity"
+
+Friday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Friday'))
+Friday_Quantity = as.data.frame(rep(Freq_Day[6,2], nrow(Friday)))
+Friday <- cbind(Friday, Friday_Quantity)
+names(Friday)[4] <- "Quantity"
+
+Saturday <- subset(Freq_Hour_Day, (Freq_Hour_Day$Day == 'Saturday'))
+Saturday_Quantity = as.data.frame(rep(Freq_Day[7,2], nrow(Saturday)))
+Saturday <- cbind(Saturday, Saturday_Quantity)
+names(Saturday)[4] <- "Quantity"
+
+Freq_Hour_Day <- rbind(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+
+##### Calculation of the average entrances quantity by hour and day #####
+Average_Entrances_Quantity <- as.data.frame(Freq_Hour_Day$Frequency/Freq_Hour_Day$Quantity)
+Freq_Hour_Day <- cbind(Freq_Hour_Day, Average_Entrances_Quantity)
+names(Freq_Hour_Day)[5] <- "Average_Entrances_Quantity"
+
+##### Sort Freq_Hour_Day table by the day of the week #####
+Freq_Hour_Day$Day <- factor(Freq_Hour_Day$Day, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+Freq_Hour_Day <- Freq_Hour_Day[order(Freq_Hour_Day$Day),]
+
+library(ggplot2)
+
+##### Use a geom_tile for the visualization #####
+ggplot(Freq_Hour_Day, aes(x = Freq_Hour_Day$Hour, y = Freq_Hour_Day$Day)) +
+  geom_tile(aes(fill = Freq_Hour_Day$Average_Entrances_Quantity)) + scale_fill_continuous(low = "#f7fbff", high = "#08306b", name = "Average Entrances Quantity") + 
+  labs(x = "Hour of the Day", y = "Day of the Week", title = "Average Entrances Quantity by Hour and Day")
