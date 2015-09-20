@@ -1,0 +1,17 @@
+# Information-Visualization
+The project of Pini and Ilana
+
+library(shiny)
+
+shinyUI(
+  fluidPage(
+    titlePanel("Main Screen"),
+    sidebarLayout(
+      sidebarPanel(
+        selectInput("Intersection", label = "Choose an Intersection", choices = list("Bilu" = 1, "Cabri" = 2, "Elishama" = 3, "Givati" = 4, "Hashiva" = 5))),
+      mainPanel(
+        plotOutput("tile")
+      )
+    )
+  )
+)
