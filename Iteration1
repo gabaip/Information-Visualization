@@ -1,0 +1,69 @@
+# Information-Visualization
+The project of Pini and Ilana
+
+##### Create an empty table named "Intersections" with four columns: "Name", "Lat", "Long" and "Red_Percentage" #####
+Intersections <- data.frame(matrix(NA, nrow = 0, ncol = 4))
+names(Intersections) <- c("Name", "Lat", "Long", "Red_Percentage")
+
+##### Read five intersections data (Bilu, Cabri, Elishama, Givati and Hashiva) from text files #####
+Bilu <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Bilu.txt")
+names(Bilu) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+Cabri <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Cabri.txt")
+names(Cabri) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+Elishama <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Elishama.txt")
+names(Elishama) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+Givati <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Givati.txt")
+names(Givati) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+Hashiva <- read.delim("C:/Users/Pini/Desktop/Visualization/Project/Data/Hashiva.txt")
+names(Hashiva) <- c("Date", "Time", "Green_Time", "Yellow_Time", "Red_Time")
+
+##### Calculation of the percentage of vehicles passing a red light at Bilu intersection #####
+Red_Table <- subset(Bilu, (Bilu$Yellow_Time >= '3000') & (Bilu$Red_Time > '0'))
+Red_Percentage <- (nrow(Red_Table)/nrow(Bilu))*100
+
+##### Add Bilu intersection data to "Intersections" table #####
+Intersection <- c("Bilu", 31.870171, 34.818605, as.numeric(Red_Percentage))
+Intersections[nrow(Intersections) + 1,] <- Intersection
+
+##### Calculation of the percentage of vehicles passing a red light at Cabri intersection #####
+Red_Table <- subset(Cabri, (Cabri$Yellow_Time >= '3000') & (Cabri$Red_Time > '0'))
+Red_Percentage <- (nrow(Red_Table)/nrow(Cabri))*100
+
+##### Add Cabri intersection data to "Intersections" table #####
+Intersection <- c("Cabri", 33.016405, 35.143780, as.numeric(Red_Percentage))
+Intersections[nrow(Intersections) + 1,] <- Intersection
+
+##### Calculation of the percentage of vehicles passing a red light at Elishama intersection #####
+Red_Table <- subset(Elishama, (Elishama$Yellow_Time >= '3000') & (Elishama$Red_Time > '0'))
+Red_Percentage <- (nrow(Red_Table)/nrow(Elishama))*100
+
+##### Add Elishama intersection data to "Intersections" table #####
+Intersection <- c("Elishama", 32.164715, 34.926266, as.numeric(Red_Percentage))
+Intersections[nrow(Intersections) + 1,] <- Intersection
+
+##### Calculation of the percentage of vehicles passing a red light at Givati intersection #####
+Red_Table <- subset(Givati, (Givati$Yellow_Time >= '3000') & (Givati$Red_Time > '0'))
+Red_Percentage <- (nrow(Red_Table)/nrow(Givati))*100
+
+##### Add Givati intersection data to "Intersections" table #####
+Intersection <- c("Givati", 31.655036, 34.662675, as.numeric(Red_Percentage))
+Intersections[nrow(Intersections) + 1,] <- Intersection
+
+##### Calculation of the percentage of vehicles passing a red light at Hashiva intersection #####
+Red_Table <- subset(Hashiva, (Hashiva$Yellow_Time >= '3000') & (Hashiva$Red_Time > '0'))
+Red_Percentage <- (nrow(Red_Table)/nrow(Hashiva))*100
+
+##### Add Hashiva intersection data to "Intersections" table #####
+Intersection <- c("Hashiva", 32.010551, 34.814360, as.numeric(Red_Percentage))
+Intersections[nrow(Intersections) + 1,] <- Intersection
+
+library (leaflet)
+
+##### Use an interactive map for the visualization #####
+Map <- leaflet(Intersections) %>% addTiles() %>%
+  addCircles(lat = ~Lat, lng = ~Long, weight = 20, radius = ~Red_Percentage, popup = ~Red_Percentage)
+Map
